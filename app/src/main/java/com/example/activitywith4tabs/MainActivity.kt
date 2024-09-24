@@ -1,26 +1,31 @@
 package com.example.activitywith4tabs
 
+import android.annotation.SuppressLint
 import android.os.Bundle
+import android.view.View
+import android.widget.ImageView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var tabHome: TextView
-    private lateinit var tabDashboard: TextView
-    private lateinit var tabNotifications: TextView
-    private lateinit var tabProfile: TextView
+    private lateinit var tabHome: View
+    private lateinit var tabDashboard: View
+    private lateinit var tabNotifications: View
+    private lateinit var tabProfile: View
 
     private var homeFragment: Fragment? = null
     private var dashboardFragment: Fragment? = null
     private var notificationsFragment: Fragment? = null
     private var profileFragment: Fragment? = null
+
+    private var currentTabTag: String = TAG_HOME
 
     companion object {
         // Fragment tags
@@ -29,6 +34,9 @@ class MainActivity : AppCompatActivity() {
         private const val TAG_DASHBOARD = "${TAG_PREFIX}DASHBOARD"
         private const val TAG_NOTIFICATIONS = "${TAG_PREFIX}NOTIFICATIONS"
         private const val TAG_PROFILE = "${TAG_PREFIX}PROFILE"
+
+        // Saved instance state keys
+        private const val KEY_CURRENT_TAB = "CURRENT_TAB"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,16 +56,49 @@ class MainActivity : AppCompatActivity() {
 
         setupTabs()
 
-        if (savedInstanceState == null) {
-            loadFragment(TAG_HOME)
-        }
+        // 从 savedInstanceState 恢复当前选中的 Tab，或使用默认值
+        currentTabTag = savedInstanceState?.getString(KEY_CURRENT_TAB) ?: TAG_HOME
+        // 加载相应的 Fragment 并更新 Tab 状态
+        loadFragment(currentTabTag)
+        updateTabStates(currentTabTag)
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        // 保存当前选中的 Tab
+        outState.putString(KEY_CURRENT_TAB, currentTabTag)
     }
 
     private fun setupTabs() {
-        tabHome.setOnClickListener { loadFragment(TAG_HOME) }
-        tabDashboard.setOnClickListener { loadFragment(TAG_DASHBOARD) }
-        tabNotifications.setOnClickListener { loadFragment(TAG_NOTIFICATIONS) }
-        tabProfile.setOnClickListener { loadFragment(TAG_PROFILE) }
+        setupTab(tabHome, R.drawable.ic_home, "首页", TAG_HOME)
+        setupTab(tabDashboard, R.drawable.ic_search, "仪表盘", TAG_DASHBOARD)
+        setupTab(tabNotifications, R.drawable.ic_notification, "通知", TAG_NOTIFICATIONS)
+        setupTab(tabProfile, R.drawable.ic_profile, "个人", TAG_PROFILE)
+    }
+
+    private fun setupTab(tabView: View, iconResId: Int, text: String, tag: String) {
+        tabView.findViewById<ImageView>(R.id.tabIcon).setImageResource(iconResId)
+        tabView.findViewById<TextView>(R.id.tabText).text = text
+        tabView.setOnClickListener {
+            loadFragment(tag)
+            updateTabStates(tag)
+        }
+    }
+
+    private fun updateTabStates(selectedTag: String) {
+        updateTabState(tabHome, selectedTag == TAG_HOME)
+        updateTabState(tabDashboard, selectedTag == TAG_DASHBOARD)
+        updateTabState(tabNotifications, selectedTag == TAG_NOTIFICATIONS)
+        updateTabState(tabProfile, selectedTag == TAG_PROFILE)
+        currentTabTag = selectedTag
+    }
+
+    @SuppressLint("ResourceType")
+    private fun updateTabState(tabView: View, isSelected: Boolean) {
+        val colorStateList = ContextCompat.getColorStateList(this, R.drawable.tab_color_selector)
+        tabView.isSelected = isSelected
+        tabView.findViewById<ImageView>(R.id.tabIcon).imageTintList = colorStateList
+        tabView.findViewById<TextView>(R.id.tabText).setTextColor(colorStateList)
     }
 
     private fun loadFragment(tag: String) {
