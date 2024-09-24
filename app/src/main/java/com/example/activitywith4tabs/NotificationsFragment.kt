@@ -11,6 +11,10 @@ import androidx.fragment.app.Fragment
 class NotificationsFragment : Fragment() {
     private lateinit var contentView: TextView
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_notifications, container, false)
     }
@@ -28,13 +32,21 @@ class NotificationsFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
+    }
+
+    override fun onResume() {
+        super.onResume()
         // Fragment 变为可见时的逻辑
         updateContent()
     }
 
+    override fun onPause() {
+        super.onPause()
+        // Fragment 变为不可见时的逻辑
+    }
+
     override fun onStop() {
         super.onStop()
-        // Fragment 变为不可见时的逻辑
     }
 
     @SuppressLint("SetTextI18n")

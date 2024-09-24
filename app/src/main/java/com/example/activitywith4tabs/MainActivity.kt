@@ -107,7 +107,7 @@ class MainActivity : AppCompatActivity() {
             supportFragmentManager.fragments.forEach { fragment ->
                 if (fragment.tag?.startsWith(TAG_PREFIX) == true) {
                     hide(fragment)
-                    setMaxLifecycle(fragment, Lifecycle.State.CREATED)
+                    setMaxLifecycle(fragment, Lifecycle.State.STARTED)
                 }
             }
 
