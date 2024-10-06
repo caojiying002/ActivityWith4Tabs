@@ -24,12 +24,6 @@ class HomeFragment : Fragment() {
         contentView = view.findViewById(R.id.contentView)
     }
 
-    /** 不要使用此方法监听，避免与Fragment生命周期函数不一致 */
-    override fun onHiddenChanged(hidden: Boolean) {
-        super.onHiddenChanged(hidden)
-        android.util.Log.d("Fragment", "HomeFragment onHiddenChanged: $hidden")
-    }
-
     override fun onStart() {
         super.onStart()
     }
